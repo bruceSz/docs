@@ -1,0 +1,37 @@
+THP:
+
+	基本功能：
+	1 大页，按照每次页miss 2M的虚拟内存进行分配；
+	2 导致更少的tlb miss。
+	
+	特性：
+	3 兼容： 不支持大页的组件，可以使用常规的page fault 逻辑
+	4 如果因为内存页碎片，导致大页无法分配，退到正常page fault逻辑
+	5 如果内存碎片情况减少，可以分配大页，已经分配的正常页面，重新分配到大页上。（如果khugepage开启）
+	6 尽量使用大页，并且不使用”预留内存“
+	
+	使用：
+	7 不需要“预留内存”支持，不需要用户程序修改
+	8 优化用户程序，避免“flood of mmap”
+	9 对于分配了2M但是程序只使用了1 byte这种情况，可以在系统层禁止开启大页，只在MADV_HUGEPAGE区域
+	10 嵌入式系统应该避免浪费内存，参考9
+	11 不怕浪费内存，并且性能有明显提升的应用，可以： madvise(MADV_HUGEPAGE) on their critical mmapped region。
+	
+	配置:
+	开启模式
+	echo always >/sys/kernel/mm/transparent_hugepage/enabled khugepage开启
+	echo madvise >/sys/kernel/mm/transparent_hugepage/enabled khugepage开启 在madvice区域内部
+	echo never >/sys/kernel/mm/transparent_hugepage/enabled
+	
+	defrag模式：
+	echo always >/sys/kernel/mm/transparent_hugepage/defrag 应用stall，出发内存compact
+	echo defer >/sys/kernel/mm/transparent_hugepage/defrag  应用出发swap，khugepage后台compact内存，分配大页
+	echo madvise >/sys/kernel/mm/transparent_hugepage/defrag 对于madvice区域，和always行为一致
+	echo never >/sys/kernel/mm/transparent_hugepage/defrag 
+	
+	khugepage中开启defrag：
+	echo 0 >/sys/kernel/mm/transparent_hugepage/khugepaged/defrag
+	echo 1 >/sys/kernel/mm/transparent_hugepage/khugepaged/defrag
+	
+	实现细节：
+	https://www.kernel.org/doc/Documentation/vm/transhuge.txt

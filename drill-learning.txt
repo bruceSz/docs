@@ -1,0 +1,24 @@
+drill 简介：
+
+1 四种数据：复杂，简单，固定schema，
+2 data-model：relation,
+3 data-driven query -> compilation
+4 columnar execution -> complex
+
+drill in depth:
+
+1 enterprise 数据分析： hadoop， hbase, casendra， stream ， elasticsearch, solr.
+2 what about interfactive ad-hoc query?  old:hive, greenplum, mysql,teradata,oracle.
+										 延迟高，响应慢..
+										 new: drill, impala, citusdata, hadapt...
+3 from dremel 2010: multi-level execution trees, columnar data layout, fast
+4 apache drill-key facts:
+	nested data first, sql 2003, ispired by dremel,schema optional
+5 use case:
+	different data source
+	logistics
+	
+6 high=level architecture:
+	 drillbit,maximum locality
+	 co-ordination
+	 zookeeper,distributed cache(for metadata,locality).
